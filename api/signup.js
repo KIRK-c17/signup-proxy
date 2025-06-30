@@ -1,34 +1,29 @@
-const express = require('express');
-const fetch = require('node-fetch');
-
-const app = express();
-app.use(express.json());
-
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*'); 
+export default async function handler(req, res) {
+  // Always include CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-  next();
-});
 
-app.post('/signup', async (req, res) => {
+  // Handle preflight request
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Only POST requests are allowed' });
+  }
+
   try {
     const response = await fetch('https://codingislife.infinityfreeapp.com/signup-api/signup.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(req.body),
+      body: JSON.stringify(req.body)
     });
 
     const data = await response.json();
-    res.status(response.status).json(data);
+
+    return res.status(response.status).json(data);
   } catch (error) {
-    console.error('Proxy error:', error);
-    res.status(500).json({ status: 'error', message: 'Proxy server error' });
+    return res.status(500).json({ message: 'Proxy failed', error: error.message });
   }
-});
-
-module.exports = app;
-
+}
