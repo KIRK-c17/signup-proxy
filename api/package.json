@@ -1,0 +1,12 @@
+{
+  "name": "signup-proxy",
+  "version": "1.0.0",
+  "main": "api/signup.js",
+  "scripts": {
+    "start": "node api/signup.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.12"
+  }
+}
